@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -76,6 +77,13 @@ void draw(uint16_t argument)
 	}
 }
 
+void skip_next(bool cond)
+{
+	if (cond) {
+		program_counter = program_counter + 2;
+	}
+}
+
 int8_t run_emulation()
 {
 	for (;;) {
@@ -84,8 +92,10 @@ int8_t run_emulation()
 
 		uint8_t op_code = instruction >> 12;
 		uint16_t argument = instruction & 0xFFF;
-		uint8_t reg_number;
-		uint8_t value;
+
+		uint8_t reg_number = argument >> 8;
+		uint8_t value = argument & 0xFF;
+
 		switch (op_code) {
 			case 0xa:
 				i_register = argument;
@@ -96,15 +106,15 @@ int8_t run_emulation()
 				stack[stack_pointer] = program_counter + 2; 
 				program_counter = argument;
 				break;
+			case 0x3:
+				skip_next(v_registers[reg_number] == value);
+				program_counter = program_counter + 2;
+				break;
 			case 0x6:
-				reg_number = argument >> 8;
-				value = argument & 0xFF;
 				v_registers[reg_number] = value;
 				program_counter = program_counter + 2;
 				break;
 			case 0x7:
-				reg_number = argument >> 8;
-				value = argument & 0xFF;
 				v_registers[reg_number] += value;
 				program_counter = program_counter + 2;
 				break;
