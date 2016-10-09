@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 
 #define WIDTH 64
 #define HEIGHT 32
@@ -131,6 +132,9 @@ int8_t run_emulation()
 			case 0x7:
 				v_registers[reg_number] += value;
 				break;
+			case 0xC:
+				v_registers[reg_number] = (rand() % (0xFF + 1)) & value; 
+				break;
 			case 0xD:
 				draw(argument);
 
@@ -159,6 +163,8 @@ int8_t run_emulation()
 
 int main(int argc, char **argv)
 {
+	srand(time(NULL));
+
 	if (argc != 2) {
 		printf("Usage: chip8 $file_name\n");
 
