@@ -77,10 +77,14 @@ void draw(uint16_t argument)
 	}
 }
 
+void advance_program_counter() {
+	program_counter += 2;
+}
+
 void skip_next(bool cond)
 {
 	if (cond) {
-		program_counter = program_counter + 2;
+		advance_program_counter();
 	}
 }
 
@@ -96,43 +100,46 @@ int8_t run_emulation()
 		uint8_t reg_number = argument >> 8;
 		uint8_t value = argument & 0xFF;
 
+		bool should_advance_program_counter = true;
+
 		switch (op_code) {
 			case 0xa:
 				i_register = argument;
-				program_counter = program_counter + 2;
 				break;
 			case 0x2:
 				stack_pointer++;
 				stack[stack_pointer] = program_counter + 2; 
 				program_counter = argument;
+				should_advance_program_counter = false;
 				break;
 			case 0x3:
 				skip_next(v_registers[reg_number] == value);
-				program_counter = program_counter + 2;
 				break;
 			case 0x6:
 				v_registers[reg_number] = value;
-				program_counter = program_counter + 2;
 				break;
 			case 0x7:
 				v_registers[reg_number] += value;
-				program_counter = program_counter + 2;
 				break;
 			case 0xD:
 				draw(argument);
 				print_display();
 
-				program_counter = program_counter + 2;
 				break;
 			case 0x0:
 				if (argument == 0x0EE) {
 					program_counter = stack[stack_pointer];
 					stack_pointer--;
 				}
+				should_advance_program_counter = false;
 				break;
 			default:
 				printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
 				return -1;
+		}
+
+		if (should_advance_program_counter) {
+			advance_program_counter();
 		}
 
 	}
