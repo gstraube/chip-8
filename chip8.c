@@ -60,6 +60,8 @@ void draw(uint16_t argument)
 
 	uint8_t *sprite = calloc(num_bytes, sizeof(uint8_t));
 
+	v_registers[15] = 0;
+
 	for (uint8_t i = 0; i < num_bytes; i++) {
 		sprite[i] = memory[i_register + i];
 	}
@@ -72,6 +74,10 @@ void draw(uint16_t argument)
 			uint8_t relevant_bit = sprite[i] << j;
 			uint8_t value = relevant_bit >> (7 - j);
 
+			if (display[x_pos][y_pos] && value) {
+				v_registers[15] = 1;	
+			} 
+				
 			display[x_pos][y_pos] ^= value; 
 		}
 	}
@@ -123,7 +129,6 @@ int8_t run_emulation()
 				break;
 			case 0xD:
 				draw(argument);
-				print_display();
 
 				break;
 			case 0x0:
@@ -134,6 +139,7 @@ int8_t run_emulation()
 				should_advance_program_counter = false;
 				break;
 			default:
+				print_display();
 				printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
 				return -1;
 		}
