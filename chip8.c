@@ -112,6 +112,10 @@ int8_t run_emulation()
 			case 0xa:
 				i_register = argument;
 				break;
+			case 0x1:
+				program_counter = argument;
+				should_advance_program_counter = false;
+				break;
 			case 0x2:
 				stack_pointer++;
 				stack[stack_pointer] = program_counter + 2; 
