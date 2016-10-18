@@ -5,6 +5,9 @@
 #include <math.h>
 #include <time.h>
 
+#include <GL/glew.h>
+#include <GL/glut.h>
+
 #define WIDTH 64
 #define HEIGHT 32
 
@@ -24,6 +27,8 @@ uint16_t stack[16];
 
 uint8_t display[WIDTH][HEIGHT] = {0};
 
+void draw_display();
+
 int8_t load_file(char *file_name)
 {
 	FILE *input = fopen(file_name, "r");
@@ -36,21 +41,6 @@ int8_t load_file(char *file_name)
 	fread(&memory[512], sizeof(uint8_t), 4096, input);
 
 	return 0;
-}
-
-void print_display()
-{
-	for (uint8_t i = 0; i < HEIGHT; i++) {
-		for (uint8_t j = 0; j < WIDTH; j++) {
-			if (display[j][i]) {
-				printf("*");
-			} else {
-				printf("+");
-			}
-		}
-		printf("\n");
-	}
-
 }
 
 void draw(uint16_t argument)
@@ -78,7 +68,7 @@ void draw(uint16_t argument)
 			if (display[x_pos][y_pos] && value) {
 				v_registers[15] = 1;	
 			} 
-				
+
 			display[x_pos][y_pos] ^= value; 
 		}
 	}
@@ -126,6 +116,8 @@ int8_t run_emulation()
 			case 0x3:
 				skip_next(v_registers[reg_number] == value);
 				break;
+			case 0x4:
+				skip_next(v_registers[reg_number] != value);
 			case 0x6:
 				v_registers[reg_number] = value;
 				break;
@@ -147,7 +139,6 @@ int8_t run_emulation()
 				should_advance_program_counter = false;
 				break;
 			default:
-				print_display();
 				printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
 				return -1;
 		}
@@ -161,8 +152,47 @@ int8_t run_emulation()
 	return 0;
 }
 
+#define EX_HEIGHT 32
+#define EX_WIDTH 64
+
+void draw_display()
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	GLubyte pixels[HEIGHT][WIDTH][3];
+
+	for (uint8_t i = 0; i < HEIGHT; i++) {
+		for (uint8_t j = 0; j < WIDTH; j++) {
+			uint8_t c = 255;
+			if (!display[WIDTH - 1 - j][HEIGHT - 1 - i]) {
+				c = 0;
+			}
+			pixels[i][j][0] = (GLubyte) c;
+			pixels[i][j][1] = (GLubyte) c;
+			pixels[i][j][2] = (GLubyte) c;
+		}
+	}
+
+	glPixelZoom(10.0f, 10.0f);
+	glDrawPixels(WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	glFlush();
+}
+
+uint8_t init_display(int *argc, char **argv)
+{
+	glutInitWindowSize(640, 320);
+	glutInitWindowPosition(0, 0);
+	glutInit(argc, argv);
+	glutCreateWindow("chip-8");
+	glutDisplayFunc(draw_display);
+
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
+
 	srand(time(NULL));
 
 	if (argc != 2) {
@@ -175,7 +205,11 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	} 
 
+	init_display(&argc, argv);
+
 	run_emulation();
+
+	glutMainLoop();
 
 	return EXIT_SUCCESS;
 }
