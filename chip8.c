@@ -118,6 +118,7 @@ int8_t run_emulation()
 				break;
 			case 0x4:
 				skip_next(v_registers[reg_number] != value);
+				break;
 			case 0x6:
 				v_registers[reg_number] = value;
 				break;
