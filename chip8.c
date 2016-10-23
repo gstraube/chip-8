@@ -134,6 +134,8 @@ int8_t run_emulation()
 			case 0xF:
 				if (value == 0x15) {
 					delay_timer = v_registers[reg_number];
+				} else if (value == 0x1E) {
+					i_register += v_registers[reg_number];
 				} else {
 					printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
 					return -1;
