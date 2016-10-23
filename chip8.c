@@ -156,9 +156,6 @@ int8_t run_emulation()
 	return 0;
 }
 
-#define EX_HEIGHT 32
-#define EX_WIDTH 64
-
 void draw_display()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
