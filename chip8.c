@@ -129,7 +129,11 @@ int8_t run_emulation()
 				break;
 			case 0xD:
 				draw(argument);
-
+				break;
+			case 0xF:
+				if (value == 0x15) {
+					delay_timer = v_registers[reg_number];
+				}
 				break;
 			case 0x0:
 				if (argument == 0x0EE) {
