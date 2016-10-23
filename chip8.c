@@ -133,12 +133,18 @@ int8_t run_emulation()
 			case 0xF:
 				if (value == 0x15) {
 					delay_timer = v_registers[reg_number];
+				} else {
+					printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
+					return -1;
 				}
 				break;
 			case 0x0:
 				if (argument == 0x0EE) {
 					program_counter = stack[stack_pointer];
 					stack_pointer--;
+				} else {
+					printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
+					return -1;
 				}
 				should_advance_program_counter = false;
 				break;
