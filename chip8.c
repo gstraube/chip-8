@@ -5,8 +5,7 @@
 #include <math.h>
 #include <time.h>
 
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include <SDL.h>
 
 #define WIDTH 64
 #define HEIGHT 32
@@ -27,7 +26,10 @@ uint16_t stack[16];
 
 uint8_t display[WIDTH][HEIGHT] = {0};
 
-void draw_display();
+SDL_Window *window;
+SDL_Renderer *renderer;
+
+void draw_in_window();
 
 int8_t load_file(char *file_name)
 {
@@ -70,6 +72,10 @@ void draw(uint16_t argument)
 			} 
 
 			display[x_pos][y_pos] ^= value; 
+
+			if (display[x_pos][y_pos]) {
+				SDL_RenderDrawPoint(renderer, x_pos, y_pos);
+			}
 		}
 	}
 }
@@ -87,7 +93,15 @@ void skip_next(bool cond)
 
 int8_t run_emulation()
 {
-	for (;;) {
+	SDL_Event event;
+	bool has_user_quit = false;
+	while (!has_user_quit) {
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT) {
+				has_user_quit = true;
+			}
+		}
+
 		uint16_t instruction = 0; 	
 		instruction = (memory[program_counter] << 8) | memory[program_counter + 1];
 
@@ -130,6 +144,7 @@ int8_t run_emulation()
 				break;
 			case 0xD:
 				draw(argument);
+				SDL_RenderPresent(renderer);
 				break;
 			case 0xF:
 				if (value == 0x15) {
@@ -159,45 +174,24 @@ int8_t run_emulation()
 		if (should_advance_program_counter) {
 			advance_program_counter();
 		}
-
-	}
+	}	
 
 	return 0;
 }
 
-void draw_display()
+void create_window()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	GLubyte pixels[HEIGHT][WIDTH][3];
+	SDL_Init(SDL_INIT_VIDEO);
+	SDL_CreateWindowAndRenderer(WIDTH * 10, HEIGHT * 10, 0, &window, &renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_RenderClear(renderer);
+	SDL_RenderPresent(renderer);
 
-	for (uint8_t i = 0; i < HEIGHT; i++) {
-		for (uint8_t j = 0; j < WIDTH; j++) {
-			uint8_t c = 255;
-			if (!display[WIDTH - 1 - j][HEIGHT - 1 - i]) {
-				c = 0;
-			}
-			pixels[i][j][0] = (GLubyte) c;
-			pixels[i][j][1] = (GLubyte) c;
-			pixels[i][j][2] = (GLubyte) c;
-		}
+	if (SDL_RenderSetScale(renderer, 10.0f, 10.0f)) {
+		printf("Error: %s\n", SDL_GetError());
 	}
 
-	glPixelZoom(10.0f, 10.0f);
-	glDrawPixels(WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-	glFlush();
-}
-
-uint8_t init_display(int *argc, char **argv)
-{
-	glutInitWindowSize(640, 320);
-	glutInitWindowPosition(0, 0);
-	glutInit(argc, argv);
-	glutCreateWindow("chip-8");
-	glutDisplayFunc(draw_display);
-
-	return 0;
+	SDL_RenderPresent(renderer);
 }
 
 int main(int argc, char **argv)
@@ -215,11 +209,11 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	} 
 
-	init_display(&argc, argv);
+	create_window();
 
 	run_emulation();
-
-	glutMainLoop();
+	SDL_DestroyWindow(window);
+	SDL_Quit;
 
 	return EXIT_SUCCESS;
 }
