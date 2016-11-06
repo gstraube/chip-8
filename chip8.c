@@ -29,6 +29,8 @@ uint8_t display[WIDTH][HEIGHT] = {0};
 SDL_Window *window;
 SDL_Renderer *renderer;
 
+bool key_pressed[16];
+
 void draw_in_window();
 
 int8_t load_file(char *file_name)
@@ -91,6 +93,39 @@ void skip_next(bool cond)
 	}
 }
 
+uint8_t map_key(SDL_Keycode key)
+{
+	switch (key) {
+		case SDLK_4: return 0x1;
+		case SDLK_5: return 0x2;
+		case SDLK_6: return 0x3;
+		case SDLK_7: return 0xC;
+		case SDLK_r: return 0x4;
+		case SDLK_t: return 0x5;
+		case SDLK_z: return 0x6;
+		case SDLK_u: return 0xD;
+		case SDLK_f: return 0x7;
+		case SDLK_g: return 0x8;
+		case SDLK_h: return 0x9;
+		case SDLK_j: return 0xE;
+		case SDLK_v: return 0xA;
+		case SDLK_b: return 0x0;
+		case SDLK_n: return 0xB;
+		case SDLK_m: return 0xF;
+		default: return -1;
+	}
+}
+
+void register_key(SDL_Keycode key)
+{
+	key_pressed[map_key(key)] = true;
+}
+
+void unregister_key(SDL_Keycode key)
+{
+	key_pressed[map_key(key)] = false;
+}
+
 int8_t run_emulation()
 {
 	SDL_Event event;
@@ -99,6 +134,14 @@ int8_t run_emulation()
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
 				has_user_quit = true;
+			}
+			if (event.type == SDL_KEYDOWN) {
+				register_key(event.key.keysym.sym);
+				printf("Key down!\n");
+			}
+			if (event.type == SDL_KEYUP) {
+				printf("Key up!\n");
+				printf("Key: %s\n", SDL_GetKeyName(event.key.keysym.sym));
 			}
 		}
 
@@ -145,6 +188,16 @@ int8_t run_emulation()
 			case 0xD:
 				draw(argument);
 				SDL_RenderPresent(renderer);
+				break;
+			case 0xE:
+				if (value == 0xA1) {
+					skip_next(!key_pressed[v_registers[reg_number]]);
+				} else if (value == 0x9E) {
+					skip_next(key_pressed[v_registers[reg_number]]);
+				} else {
+					printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
+					return -1;
+				}
 				break;
 			case 0xF:
 				if (value == 0x15) {
