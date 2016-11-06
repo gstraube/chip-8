@@ -137,11 +137,9 @@ int8_t run_emulation()
 			}
 			if (event.type == SDL_KEYDOWN) {
 				register_key(event.key.keysym.sym);
-				printf("Key down!\n");
 			}
 			if (event.type == SDL_KEYUP) {
-				printf("Key up!\n");
-				printf("Key: %s\n", SDL_GetKeyName(event.key.keysym.sym));
+				unregister_key(event.key.keysym.sym);
 			}
 		}
 
