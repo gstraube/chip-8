@@ -236,6 +236,10 @@ int8_t run_emulation()
 		if (diff < CYCLE_TIME) {
 			SDL_Delay(CYCLE_TIME - diff);
 		}
+
+		if (delay_timer) {
+			delay_timer--;
+		}
 	}	
 
 	return 0;
