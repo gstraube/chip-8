@@ -62,6 +62,7 @@ void draw(uint16_t argument)
 		sprite[i] = memory[i_register + i];
 	}
 
+	bool has_drawn = false;
 	for (int i = 0; i < num_bytes; i++) {
 		for (int j = 0; j < 8; j++) {
 			uint8_t x_pos = (i + x_offset) % WIDTH;
@@ -81,8 +82,13 @@ void draw(uint16_t argument)
 
 			if (display[x_pos][y_pos]) {
 				SDL_RenderDrawPoint(renderer, x_pos, y_pos);
+				has_drawn = true;
 			}
 		}
+	}
+
+	if (has_drawn) {
+		SDL_RenderPresent(renderer);
 	}
 }
 
@@ -192,7 +198,6 @@ int8_t run_emulation()
 				break;
 			case 0xD:
 				draw(argument);
-				SDL_RenderPresent(renderer);
 				break;
 			case 0xE:
 				if (value == 0xA1) {
