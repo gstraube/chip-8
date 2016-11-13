@@ -72,6 +72,9 @@ void draw(uint16_t argument)
 
 			if (display[x_pos][y_pos] && value) {
 				v_registers[15] = 1;	
+				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+				SDL_RenderDrawPoint(renderer, x_pos, y_pos);
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			} 
 
 			display[x_pos][y_pos] ^= value; 
