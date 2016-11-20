@@ -48,6 +48,27 @@ int8_t load_file(char *file_name)
 	return 0;
 }
 
+void set_v_register(uint16_t argument)
+{
+	uint8_t discriminator = argument & 0XF; 
+	uint8_t target = (argument >> 4) & 0XF;
+	uint8_t source = (argument >> 8) & 0xF;
+	
+	printf("Discriminator: %d, target: V%d, source: V%d\n",
+			discriminator, target, source);
+
+	uint8_t value;
+	switch (discriminator) {
+		case 0x0:
+			value = v_registers[source];	
+			break;
+		default:
+			return;		
+	}
+
+	v_registers[target] = value;
+}
+
 void draw(uint16_t argument)
 {
 	uint8_t num_bytes = argument & 0xF;
@@ -192,6 +213,9 @@ int8_t run_emulation()
 				break;
 			case 0x7:
 				v_registers[reg_number] += value;
+				break;
+			case 0x8:
+				set_v_register(argument);
 				break;
 			case 0xC:
 				v_registers[reg_number] = (rand() % (0xFF + 1)) & value; 
