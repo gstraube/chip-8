@@ -34,6 +34,9 @@ bool key_pressed[16];
 
 void draw_in_window();
 
+bool debug = false;
+FILE *debug_output;
+
 int8_t load_file(char *file_name)
 {
 	FILE *input = fopen(file_name, "r");
@@ -53,7 +56,7 @@ void set_v_register(uint16_t argument)
 	uint8_t discriminator = argument & 0XF; 
 	uint8_t target = (argument >> 4) & 0XF;
 	uint8_t source = (argument >> 8) & 0xF;
-	
+
 	uint8_t value;
 	switch (discriminator) {
 		case 0x0:
@@ -154,10 +157,29 @@ void unregister_key(SDL_Keycode key)
 	key_pressed[map_key(key)] = false;
 }
 
+void output_registers()
+{
+	if (debug) {
+		for (int i = 0; i < 16; i++) {
+			fprintf(debug_output, "V[%d]: %d\n", i, v_registers[i]);
+		}
+
+		fprintf(debug_output, "I: %d\n", i_register);
+		fprintf(debug_output, "Delay timer: %d\n", delay_timer);
+		fprintf(debug_output, "Sound timer: %d\n", sound_timer);
+
+		fprintf(debug_output, "Program counter: %d\n", program_counter);
+
+		fprintf(debug_output, "\n");
+	}
+}
+
 int8_t run_emulation()
 {
 	SDL_Event event;
 	bool has_user_quit = false;
+
+
 	while (!has_user_quit) {
 		struct timeval start, end;
 		gettimeofday(&start, NULL);
@@ -184,6 +206,10 @@ int8_t run_emulation()
 		uint8_t value = argument & 0xFF;
 
 		bool should_advance_program_counter = true;
+
+		if (debug) {
+			fprintf(debug_output, "Instruction: %x\n", instruction);
+		}
 
 		switch (op_code) {
 			case 0xa:
@@ -271,6 +297,8 @@ int8_t run_emulation()
 		if (delay_timer) {
 			delay_timer--;
 		}
+
+		output_registers();
 	}	
 
 	return 0;
@@ -293,13 +321,26 @@ void create_window()
 
 int main(int argc, char **argv)
 {
-
 	srand(time(NULL));
 
-	if (argc != 2) {
+	if (argc < 2) {
 		printf("Usage: chip8 $file_name\n");
 
 		return EXIT_FAILURE;
+	}
+
+	if (argc == 3 && strncmp("-debug", argv[2], 6) == 0) {
+		debug = true;
+
+		debug_output = fopen("debug.out", "w");
+
+		if (!debug_output) {
+			printf("Could not debug output file\n");
+
+			return -1;
+		} else {
+			printf("Debug output will be written to debug.out\n");
+		}
 	}
 
 	if (load_file(argv[1]) == -1) {
