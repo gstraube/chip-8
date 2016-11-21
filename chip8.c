@@ -54,9 +54,6 @@ void set_v_register(uint16_t argument)
 	uint8_t target = (argument >> 4) & 0XF;
 	uint8_t source = (argument >> 8) & 0xF;
 	
-	printf("Discriminator: %d, target: V%d, source: V%d\n",
-			discriminator, target, source);
-
 	uint8_t value;
 	switch (discriminator) {
 		case 0x0:
