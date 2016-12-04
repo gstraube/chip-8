@@ -86,8 +86,8 @@ void draw(uint16_t argument)
 	bool has_drawn = false;
 	for (int i = 0; i < num_bytes; i++) {
 		for (int j = 0; j < 8; j++) {
-			uint8_t x_pos = (i + x_offset) % WIDTH;
-			uint8_t y_pos = (j + y_offset) % HEIGHT;
+			uint8_t x_pos = (j + x_offset) % WIDTH;
+			uint8_t y_pos = (i + y_offset) % HEIGHT;
 
 			uint8_t relevant_bit = sprite[i] << j;
 			uint8_t value = relevant_bit >> (7 - j);
