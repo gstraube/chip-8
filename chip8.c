@@ -47,7 +47,7 @@ int8_t load_file(char *file_name)
 	}
 
 	fread(&memory[512], sizeof(uint8_t), 4096, input);
-
+	
 	return 0;
 }
 
@@ -89,8 +89,13 @@ void draw(uint16_t argument)
 			uint8_t x_pos = (j + x_offset) % WIDTH;
 			uint8_t y_pos = (i + y_offset) % HEIGHT;
 
-			uint8_t relevant_bit = sprite[i] << j;
-			uint8_t value = relevant_bit >> (7 - j);
+			uint8_t filter = 1;
+
+			for (int k = 0; k < (7 - j); k++) {
+				filter = filter * 2;
+			}
+
+			uint8_t value = sprite[i] & filter;
 
 			if (display[x_pos][y_pos] && value) {
 				v_registers[15] = 1;	
