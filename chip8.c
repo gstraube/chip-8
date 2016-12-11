@@ -54,8 +54,8 @@ int8_t load_file(char *file_name)
 void set_v_register(uint16_t argument)
 {
 	uint8_t discriminator = argument & 0XF; 
-	uint8_t target = (argument >> 4) & 0XF;
-	uint8_t source = (argument >> 8) & 0xF;
+	uint8_t target = (argument >> 8) & 0XF;
+	uint8_t source = (argument >> 4) & 0xF;
 
 	uint8_t value;
 	switch (discriminator) {
