@@ -268,6 +268,10 @@ int8_t run_emulation()
 					i_register += v_registers[reg_number];
 				} else if (value == 0x07) {
 					v_registers[reg_number] = delay_timer;
+				} else if (value == 0x65) {
+					for (int i = 0; i <= reg_number; i++) {
+						v_registers[i] = memory[i_register + i];
+					}
 				} else {
 					printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
 					return -1;
