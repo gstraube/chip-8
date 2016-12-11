@@ -166,14 +166,14 @@ void output_registers()
 {
 	if (debug) {
 		for (int i = 0; i < 16; i++) {
-			fprintf(debug_output, "V[%d]: %d\n", i, v_registers[i]);
+			fprintf(debug_output, "V[%x]: %x\n", i, v_registers[i]);
 		}
 
-		fprintf(debug_output, "I: %d\n", i_register);
-		fprintf(debug_output, "Delay timer: %d\n", delay_timer);
-		fprintf(debug_output, "Sound timer: %d\n", sound_timer);
+		fprintf(debug_output, "I: %x\n", i_register);
+		fprintf(debug_output, "Delay timer: %x\n", delay_timer);
+		fprintf(debug_output, "Sound timer: %x\n", sound_timer);
 
-		fprintf(debug_output, "Program counter: %d\n", program_counter);
+		fprintf(debug_output, "Program counter: %x\n", program_counter);
 
 		fprintf(debug_output, "\n");
 	}
