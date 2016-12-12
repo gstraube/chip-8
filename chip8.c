@@ -102,6 +102,8 @@ void draw(uint16_t argument)
 				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 				SDL_RenderDrawPoint(renderer, x_pos, y_pos);
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+				has_drawn = true;
 			} 
 
 			display[x_pos][y_pos] ^= value; 
