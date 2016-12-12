@@ -9,7 +9,7 @@
 
 #define WIDTH 64
 #define HEIGHT 32
-#define CYCLE_TIME 17
+#define CYCLE_TIME 10
 
 uint8_t memory[4096];
 uint16_t opcode;
@@ -186,7 +186,6 @@ int8_t run_emulation()
 	SDL_Event event;
 	bool has_user_quit = false;
 
-
 	while (!has_user_quit) {
 		struct timeval start, end;
 		gettimeofday(&start, NULL);
@@ -299,7 +298,7 @@ int8_t run_emulation()
 		}
 
 		gettimeofday(&end, NULL);
-		double diff = (end.tv_usec - start.tv_usec) / 1000.0;
+		uint32_t diff = (end.tv_usec - start.tv_usec) / 1000.0;
 
 		if (diff < CYCLE_TIME) {
 			SDL_Delay(CYCLE_TIME - diff);
