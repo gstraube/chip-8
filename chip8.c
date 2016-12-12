@@ -286,11 +286,14 @@ int8_t run_emulation()
 				if (argument == 0x0EE) {
 					program_counter = stack[stack_pointer];
 					stack_pointer--;
+					should_advance_program_counter = false;
+				} else if (argument == 0x0E0) {
+					memset(display, 0, sizeof(display[0][0]) * WIDTH * HEIGHT);
+					should_advance_program_counter = true;
 				} else {
 					printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
 					return -1;
 				}
-				should_advance_program_counter = false;
 				break;
 			default:
 				printf("Encountered unknown op_code %x with argument %x\n", op_code, argument);
