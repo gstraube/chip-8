@@ -269,6 +269,11 @@ int8_t run_emulation()
 					i_register += v_registers[reg_number];
 				} else if (value == 0x07) {
 					v_registers[reg_number] = delay_timer;
+				} else if (value == 0x33) {
+					uint8_t value = v_registers[reg_number];
+					memory[i_register] = value / 100;
+					memory[i_register + 1] = (value % 100) / 10;
+					memory[i_register + 2] = value % 10;
 				} else if (value == 0x55) {
 					for (int i = 0; i <= reg_number; i++) {
 						memory[i_register + i] = v_registers[i];
