@@ -209,6 +209,7 @@ int8_t run_emulation()
 		uint16_t argument = instruction & 0xFFF;
 
 		uint8_t reg_number = argument >> 8;
+		uint8_t other_reg_number = (argument >> 4) & 0xF;
 		uint8_t value = argument & 0xFF;
 
 		bool should_advance_program_counter = true;
@@ -245,6 +246,9 @@ int8_t run_emulation()
 				break;
 			case 0x8:
 				set_v_register(argument);
+				break;
+			case 0x9:
+				skip_next(v_registers[reg_number] != v_registers[other_reg_number]);
 				break;
 			case 0xC:
 				v_registers[reg_number] = (rand() % (0xFF + 1)) & value; 
