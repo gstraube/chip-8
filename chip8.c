@@ -238,6 +238,9 @@ int8_t run_emulation()
 			case 0x4:
 				skip_next(v_registers[reg_number] != value);
 				break;
+			case 0x5:
+				skip_next(v_registers[reg_number] == v_registers[other_reg_number]);
+				break;
 			case 0x6:
 				v_registers[reg_number] = value;
 				break;
