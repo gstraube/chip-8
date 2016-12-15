@@ -304,6 +304,8 @@ int8_t run_emulation()
 					i_register += v_registers[reg_number];
 				} else if (value == 0x07) {
 					v_registers[reg_number] = delay_timer;
+				} else if (value == 0x29) {
+					i_register = v_registers[reg_number] * 5;
 				} else if (value == 0x33) {
 					uint8_t value = v_registers[reg_number];
 					memory[i_register] = value / 100;
