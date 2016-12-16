@@ -313,6 +313,8 @@ int8_t run_emulation()
 					i_register += v_registers[reg_number];
 				} else if (value == 0x07) {
 					v_registers[reg_number] = delay_timer;
+				} else if (value == 0x18) {
+					sound_timer = v_registers[reg_number];
 				} else if (value == 0x29) {
 					i_register = v_registers[reg_number] * 5;
 				} else if (value == 0x33) {
