@@ -211,6 +211,8 @@ int8_t run_emulation()
 {
 	SDL_Event event;
 	bool has_user_quit = false;
+	bool has_pressed_key = false;
+	uint8_t pressed_key;
 
 	initialize_memory();
 
@@ -224,6 +226,8 @@ int8_t run_emulation()
 			}
 			if (event.type == SDL_KEYDOWN) {
 				register_key(event.key.keysym.sym);
+				has_pressed_key = true;
+				pressed_key = map_key(event.key.keysym.sym);
 			}
 			if (event.type == SDL_KEYUP) {
 				unregister_key(event.key.keysym.sym);
@@ -298,7 +302,12 @@ int8_t run_emulation()
 				}
 				break;
 			case 0xF:
-				if (value == 0x15) {
+				if (value == 0x0A) {
+					if (has_pressed_key) {
+						v_registers[reg_number] = pressed_key;
+						has_pressed_key = false;
+					}
+				} else if (value == 0x15) {
 					delay_timer = v_registers[reg_number];
 				} else if (value == 0x1E) {
 					i_register += v_registers[reg_number];
